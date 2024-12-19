@@ -9,20 +9,26 @@ export type ApiBaseTypes = {
     update: unknown;
 };
 
-export type ApiStrapiTypes<BaseType> = {
-    single: APIResponse<BaseType>;
-    many: APIResponseCollection<BaseType>;
-    create: Omit<BaseType, 'id'>;
-    update: Partial<ApiStrapiTypes<BaseType>['create']>;
-};
-
 export type ApiCustomTypes<BaseType, CustomType extends Partial<ApiBaseTypes>> = {
     [K in keyof ApiBaseTypes]: K extends keyof CustomType
         ? CustomType[K]
-        : ApiStrapiTypes<BaseType>[K];
+        : ApiDefaultTypes<BaseType>[K];
 };
 
-export abstract class ApiInstance<BaseType, Types extends ApiBaseTypes = ApiStrapiTypes<BaseType>> {
+export type ApiDefaultTypes<BaseType> = ApiCustomTypes<
+    BaseType,
+    {
+        single: APIResponse<BaseType>;
+        many: APIResponseCollection<BaseType>;
+        create: Omit<BaseType, 'id'>;
+        update: Partial<ApiDefaultTypes<BaseType>['create']>;
+    }
+>;
+
+export abstract class ApiInstance<
+    BaseType,
+    Types extends ApiBaseTypes = ApiDefaultTypes<BaseType>,
+> {
     protected httpInstance: AxiosInstance;
     protected endpoint: string;
 
@@ -60,7 +66,7 @@ export abstract class ApiInstance<BaseType, Types extends ApiBaseTypes = ApiStra
 export const getApi = <
     BaseType,
     ExtendedApi = ApiInstance<BaseType>,
-    Types extends ApiBaseTypes = ApiStrapiTypes<BaseType>,
+    Types extends ApiBaseTypes = ApiDefaultTypes<BaseType>,
 >(
     endpoint: string,
 ) => {
