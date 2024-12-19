@@ -1,5 +1,5 @@
 import { ApiCustomTypes, getApi } from '../utils/factories/api.factory';
-import { User } from '../types/users';
+import { User, UserCreate } from '../types/users';
 
 //
 // Базовое использование API
@@ -21,9 +21,7 @@ class UsersExtendedApi extends getApi<User, UsersExtendedApi>('users') {
 type UsersApiCustomTypes = ApiCustomTypes<
     User,
     {
-        create: {
-            abc: string;
-        };
+        create: UserCreate;
         single: {
             username: string;
         };
@@ -45,7 +43,8 @@ apiExtended.sum(1, 2);
 
 // Теперь create принимает в body обновленный тип
 apiRetypized.create({
-    abc: '',
+    email: '',
+    password: '',
 });
 // И findOne возвращает { username: string }
 apiRetypized.findOne(1);
