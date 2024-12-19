@@ -1,19 +1,11 @@
-import { ApiInstance, getBaseApi, getExtendedApi } from '../utils/factories/api.factory';
-import { UserApi, UserCreate, UserUpdate } from '../types/users';
+import { getApi } from '../utils/factories/api.factory';
+import { User } from '../types/users';
 
-interface IUsersApiExtended extends ApiInstance<UserApi, UsersApi, UserCreate, UserUpdate> {
-    logEndpoint: () => void;
+class UsersApi extends getApi<User, UsersApi>('users') {
+    logEndpoint() {}
 }
 
-class UsersApi extends getBaseApi<UserApi, UsersApi, UserCreate, UserUpdate>('users') {}
-class UsersApiExtended
-    extends getExtendedApi<UserApi, UsersApi, UserCreate, UserUpdate, IUsersApiExtended>('users')
-    implements IUsersApiExtended
-{
-    logEndpoint() {
-        return;
-    };
-}
+const api = UsersApi.getInstance();
 
-UsersApi.getInstance().findMany();
-UsersApiExtended.getInstance().logEndpoint();
+api.findMany();
+api.logEndpoint();

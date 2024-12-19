@@ -1,7 +1,14 @@
 import { AxiosInstance } from 'axios';
 import { HttpInstanceFactory } from './http-instance.factory';
+import { APIResponse, APIResponseCollection } from '../../types/strapi/types';
 
-export abstract class ApiInstance<SingleCopy, ManyCopies, CreateData, UpdateData> {
+export abstract class ApiInstance<
+    BaseType,
+    SingleCopy = APIResponse<BaseType>,
+    ManyCopies = APIResponseCollection<BaseType>,
+    CreateData = Omit<BaseType, 'id'>,
+    UpdateData = Partial<CreateData>,
+> {
     protected httpInstance: AxiosInstance;
     protected endpoint: string;
 
@@ -36,28 +43,24 @@ export abstract class ApiInstance<SingleCopy, ManyCopies, CreateData, UpdateData
     }
 }
 
-export const getBaseApi = <SingleCopy, ManyCopies, CreateData, UpdateData>(endpoint: string) => {
-    return class Api extends ApiInstance<SingleCopy, ManyCopies, CreateData, UpdateData> {
-        private static instance: Api | null = null;
-
-        public static getInstance(): Api {
-            if (!this.instance) {
-                this.instance = new this(endpoint);
-            }
-            return this.instance;
-        }
-    };
-};
-
-export const getExtendedApi = <SingleCopy, ManyCopies, CreateData, UpdateData, ExtendedApi extends ApiInstance<SingleCopy, ManyCopies, CreateData, UpdateData>>(endpoint: string) => {
-    return class Api extends ApiInstance<SingleCopy, ManyCopies, CreateData, UpdateData> {
+export const getApi = <
+    BaseType,
+    ExtendedApi = ApiInstance<BaseType>,
+    SingleCopy = APIResponse<BaseType>,
+    ManyCopies = APIResponseCollection<BaseType>,
+    CreateData = Omit<BaseType, 'id'>,
+    UpdateData = Partial<CreateData>,
+>(
+    endpoint: string,
+) => {
+    return class Api extends ApiInstance<BaseType, SingleCopy, ManyCopies, CreateData, UpdateData> {
         private static instance: ExtendedApi | null = null;
 
         public static getInstance(): ExtendedApi {
             if (!this.instance) {
-                this.instance = new this(endpoint) as unknown as ExtendedApi;
+                this.instance = new this(endpoint) as ExtendedApi;
             }
-            return this.instance as ExtendedApi;
+            return this.instance;
         }
     };
 };
