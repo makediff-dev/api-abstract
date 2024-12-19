@@ -1,7 +1,7 @@
 import type { Modules, UID } from '@strapi/strapi';
 
 export type ReassignKey<T, K extends keyof T, NewValue> = Omit<T, K> & {
-    K: NewValue;
+    [P in K]: NewValue;
 };
 
 export type GetValues<TSchemaUID extends UID.ContentType> =
