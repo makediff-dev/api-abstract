@@ -1,9 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-
-const destinationFolder = '/types/strapi'
-const strapiFolder = '../strapiv5';
+const destinationFolder = './types/strapi';
+const strapiFolder = '../../test/strapiv5';
 
 const files = [
     {
@@ -31,9 +30,9 @@ function copyFile({ src, dest }) {
     }
 
     // Read the source file, modify its content and write to the destination file
-    const content = fs.readFileSync(src, "utf8");
+    const content = fs.readFileSync(src, 'utf8');
 
-    fs.writeFile(dest, content, (err) => {
+    fs.writeFile(dest, content, err => {
         if (err) {
             console.error(`Error writing to destination file: ${err}`);
             process.exit(1);
@@ -43,4 +42,4 @@ function copyFile({ src, dest }) {
     });
 }
 
-files.forEach((file) => copyFile(file));
+files.forEach(file => copyFile(file));
