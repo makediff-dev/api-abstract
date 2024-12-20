@@ -1,15 +1,18 @@
-import { ApiCustomTypes, getApi } from '../utils/factories/api.factory';
-import { User, UserCreate } from '../types/users';
+import { ApiCustomTypes, ApiStrapiTypes, getApi } from '../utils/factories/api.factory';
+import { UserCreate } from '../types/users';
 
 //
 // Базовое использование API
 //
-class UsersApi extends getApi<User>('users') {}
+class UsersApi extends getApi<ApiStrapiTypes<'plugin::users-permissions.user'>>('users') {}
 
 //
 // Расширение API
 //
-class UsersExtendedApi extends getApi<User, UsersExtendedApi>('users') {
+class UsersExtendedApi extends getApi<
+    ApiStrapiTypes<'plugin::users-permissions.user'>,
+    UsersExtendedApi
+>('users') {
     sum(a: number, b: number) {
         return a + b;
     }
@@ -19,7 +22,7 @@ class UsersExtendedApi extends getApi<User, UsersExtendedApi>('users') {
 // Переназначение базовых типов API
 //
 type UsersApiCustomTypes = ApiCustomTypes<
-    User,
+    ApiStrapiTypes<'plugin::users-permissions.user'>,
     {
         create: UserCreate;
         single: {
@@ -27,7 +30,7 @@ type UsersApiCustomTypes = ApiCustomTypes<
         };
     }
 >;
-class UsersRetypizedApi extends getApi<User, UsersRetypizedApi, UsersApiCustomTypes>('users') {}
+class UsersRetypizedApi extends getApi<UsersApiCustomTypes>('users') {}
 
 //
 // Тесты
@@ -37,6 +40,7 @@ const apiExtended = UsersExtendedApi.getInstance();
 const apiRetypized = UsersRetypizedApi.getInstance();
 
 api.findMany();
+api.findOne(1);
 
 // В расширенном API мы получили доступ к указанным методам
 apiExtended.sum(1, 2);
