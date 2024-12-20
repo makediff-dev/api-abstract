@@ -1,34 +1,41 @@
 import { AxiosInstance } from 'axios';
 import { HttpInstanceFactory } from './http-instance.factory';
-import { APIResponse, APIResponseCollection } from '../../types/strapi/types';
+import {
+    APIResponse,
+    APIResponseCollection,
+    GetStrapiType,
+    StrapiModelUID,
+} from '../../types/strapi/types';
 
-export type ApiBaseTypes = {
+type ApiTypes = {
     single: unknown;
     many: unknown;
     create: unknown;
     update: unknown;
 };
 
-export type ApiCustomTypes<BaseType, CustomType extends Partial<ApiBaseTypes>> = {
-    [K in keyof ApiBaseTypes]: K extends keyof CustomType
-        ? CustomType[K]
-        : ApiDefaultTypes<BaseType>[K];
+export type ApiCustomTypes<
+    DefaultTypes extends ApiTypes,
+    CustomType extends Partial<ApiTypes> = {},
+> = {
+    [K in keyof ApiTypes]: K extends keyof CustomType ? CustomType[K] : DefaultTypes[K];
 };
 
-export type ApiDefaultTypes<BaseType> = ApiCustomTypes<
-    BaseType,
-    {
-        single: APIResponse<BaseType>;
-        many: APIResponseCollection<BaseType>;
-        create: Omit<BaseType, 'id'>;
-        update: Partial<ApiDefaultTypes<BaseType>['create']>;
-    }
->;
+export type ApiBaseTypes<BaseType extends object> = ApiCustomTypes<{
+    single: BaseType;
+    many: BaseType[];
+    create: Omit<BaseType, 'id'>;
+    update: Partial<Omit<BaseType, 'id'>>;
+}>;
 
-export abstract class ApiInstance<
-    BaseType,
-    Types extends ApiBaseTypes = ApiDefaultTypes<BaseType>,
-> {
+export type ApiStrapiTypes<TSchemaUID extends StrapiModelUID> = ApiCustomTypes<{
+    single: APIResponse<TSchemaUID>;
+    many: APIResponseCollection<TSchemaUID>;
+    create: Omit<GetStrapiType<TSchemaUID>, 'id'>;
+    update: Partial<Omit<GetStrapiType<TSchemaUID>, 'id'>>;
+}>;
+
+export abstract class ApiInstance<Types extends ApiTypes> {
     protected httpInstance: AxiosInstance;
     protected endpoint: string;
 
@@ -63,14 +70,10 @@ export abstract class ApiInstance<
     }
 }
 
-export const getApi = <
-    BaseType,
-    ExtendedApi = ApiInstance<BaseType>,
-    Types extends ApiBaseTypes = ApiDefaultTypes<BaseType>,
->(
+export const getApi = <Types extends ApiTypes, ExtendedApi = ApiInstance<Types>>(
     endpoint: string,
 ) => {
-    return class Api extends ApiInstance<BaseType, Types> {
+    return class Api extends ApiInstance<Types> {
         private static instance: ExtendedApi | null = null;
 
         public static getInstance(): ExtendedApi {
