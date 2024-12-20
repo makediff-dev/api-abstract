@@ -1,10 +1,7 @@
 import type { Schema, UID } from '@strapi/strapi';
 
-type ReassignStrapiModelKeys<
-    TSchemaUID extends UID.ContentType,
-    TSchemaAttributes = Schema.Attributes<TSchemaUID>,
-> = {
-    [Attribute in keyof TSchemaAttributes]: Attribute extends Extract<
+type UseOriginTypes<TSchemaUID extends UID.ContentType> = {
+    [Attribute in keyof Schema.Attributes<TSchemaUID>]: Attribute extends Extract<
         keyof Schema.Attributes<TSchemaUID>,
         string
     >
@@ -12,7 +9,7 @@ type ReassignStrapiModelKeys<
         : never;
 };
 
-export type GetStrapiType<TSchemaUID extends UID.ContentType> = ReassignStrapiModelKeys<TSchemaUID>;
+export type GetStrapiType<TSchemaUID extends UID.ContentType> = UseOriginTypes<TSchemaUID>;
 
 export interface APIResponseCollectionMetadata {
     pagination: {
