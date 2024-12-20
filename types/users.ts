@@ -1,6 +1,8 @@
-import { APIResponse, APIResponseCollection, GetStrapiType } from './strapi/types';
+import { APIResponse, APIResponseCollection, GetStrapiType, StrapiModelUID } from './strapi/types';
 
-export type User = GetStrapiType<'plugin::users-permissions.user'>;
+const userModelUID: StrapiModelUID = 'plugin::users-permissions.user';
+type UserModelUID = typeof userModelUID;
+export type User = GetStrapiType<UserModelUID>;
 export type UserCreate = Pick<Partial<User>, 'email' | 'password'>;
-export type UserApi = APIResponse<User>;
-export type UsersApi = APIResponseCollection<User>;
+export type UserApi = APIResponse<UserModelUID>;
+export type UsersApi = APIResponseCollection<UserModelUID>;

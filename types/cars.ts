@@ -1,5 +1,7 @@
-import { APIResponse, APIResponseCollection, GetStrapiType } from './strapi/types';
+import { APIResponse, APIResponseCollection, GetStrapiType, StrapiModelUID } from './strapi/types';
 
-export type Car = GetStrapiType<'api::car.car'>;
-export type CarApi = APIResponse<Car>;
-export type CarsApi = APIResponseCollection<Car>;
+const carSchemaUID: StrapiModelUID = 'api::car.car';
+type CarSchemaUID = typeof carSchemaUID;
+export type Car = GetStrapiType<CarSchemaUID>;
+export type CarApi = APIResponse<CarSchemaUID>;
+export type CarsApi = APIResponseCollection<CarSchemaUID>;

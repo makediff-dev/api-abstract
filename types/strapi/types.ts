@@ -1,6 +1,8 @@
 import type { Schema, UID } from '@strapi/strapi';
 
-type UseOriginTypes<TSchemaUID extends UID.ContentType> = {
+export type StrapiModelUID = UID.ContentType;
+
+type UseOriginTypes<TSchemaUID extends StrapiModelUID> = {
     [Attribute in keyof Schema.Attributes<TSchemaUID>]: Attribute extends Extract<
         keyof Schema.Attributes<TSchemaUID>,
         string
@@ -9,7 +11,7 @@ type UseOriginTypes<TSchemaUID extends UID.ContentType> = {
         : never;
 };
 
-export type GetStrapiType<TSchemaUID extends UID.ContentType> = UseOriginTypes<TSchemaUID>;
+export type GetStrapiType<TSchemaUID extends StrapiModelUID> = UseOriginTypes<TSchemaUID>;
 
 export interface APIResponseCollectionMetadata {
     pagination: {
@@ -20,11 +22,19 @@ export interface APIResponseCollectionMetadata {
     };
 }
 
-export interface APIResponse<T> {
-    data: T;
-}
+const userSchemaUID: StrapiModelUID = 'plugin::users-permissions.user';
+type UserSchemaUID = typeof userSchemaUID;
 
-export interface APIResponseCollection<T> {
-    data: T[];
-    meta: APIResponseCollectionMetadata;
-}
+export type APIResponse<TSchemaUID extends StrapiModelUID> = TSchemaUID extends UserSchemaUID
+    ? GetStrapiType<TSchemaUID>
+    : {
+          data: GetStrapiType<TSchemaUID>;
+      };
+
+export type APIResponseCollection<TSchemaUID extends StrapiModelUID> =
+    TSchemaUID extends UserSchemaUID
+        ? GetStrapiType<TSchemaUID>[]
+        : {
+              data: GetStrapiType<TSchemaUID>[];
+              meta: APIResponseCollectionMetadata;
+          };
