@@ -44,7 +44,6 @@ apiExtended.sum(1, 2);
 // Теперь create принимает в body обновленный тип
 apiRetypized.create({
     email: '',
-    password: '',
 });
 // И findOne возвращает { username: string }
 apiRetypized.findOne(1);
